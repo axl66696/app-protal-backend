@@ -1,44 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { NatsJetStreamServer } from './jetstream/jetstream.service';
+import { NatsJetStreamServer } from './services/jetstream.service';
 import { readdirSync } from 'fs';
-import { ConsumerMeta } from './types';
+import { ControllerMetadata } from './types';
 
-(async () => {
-  // 連線至NATS
+async function main() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  const appService = app.get(NatsJetStreamServer);
-  await appService.connect();
+  const jetStreamServer = app.get(NatsJetStreamServer);
+  await jetStreamServer.connect();
 
-  // 抓取資料夾
-  const srcFiles = readdirSync(__dirname);
-  const folders = srcFiles.filter((filename) => !filename.includes('.'));
-
-  // 找出每個Controller檔案
-  const controllerFiles = folders.map((folder) => {
-    const folderDir = `${__dirname}/${folder}`;
-    const files = readdirSync(folderDir);
-    const controllerFile = files.find(
-      (file) => file.includes('controller') && !file.includes('controller.d'),
-    );
-
-    return controllerFile && `${__dirname}/${folder}/${controllerFile}`;
-  });
-  const foundControllerFiles = controllerFiles.filter((x) => x);
-
-  // 訂閱每個Controller的主題
-  foundControllerFiles.forEach(async (file) => {
-    const ControllerModule = await import(file);
+  const controllerFilePaths = findControllerFiles();
+  for (const controllerFilePath of controllerFilePaths) {
+    const ControllerModule = await import(controllerFilePath);
     const ControllerClass = ControllerModule.default;
-    if (!ControllerClass) return;
+    if (!ControllerClass) continue;
 
     const controller = new ControllerClass();
-    const subjectPrefix = Reflect.getMetadata('subjectPrefix', ControllerClass);
-    const consumers =
-      (Reflect.getMetadata('consumers', controller) as ConsumerMeta[]) || [];
+    const { subjectPrefix, consumers } = getControllerMetadata(controller);
 
-    // 訂閱並根據主題分配工作
-    appService.subscribeMessage(subjectPrefix, (message, payload) => {
+    jetStreamServer.subscribeMessage(subjectPrefix, (message, payload) => {
       const shortSubject = message.subject.split(`${subjectPrefix}.`)[1];
       const foundConsumer = consumers.find((x) => x.subject === shortSubject);
       if (!foundConsumer) return;
@@ -47,5 +27,23 @@ import { ConsumerMeta } from './types';
     });
 
     console.log(`Listening on subject ${subjectPrefix}.>`);
-  });
-})();
+  }
+}
+
+function findControllerFiles() {
+  const controllerFiles = readdirSync(`${__dirname}/controllers`)
+    .filter((file) => file.endsWith('controller.js'))
+    .map((file) => `${__dirname}/controllers/${file}`);
+
+  return controllerFiles;
+}
+
+function getControllerMetadata(controller: any): ControllerMetadata {
+  const ControllerClass = controller.constructor;
+  return {
+    subjectPrefix: Reflect.getMetadata('subjectPrefix', ControllerClass),
+    consumers: Reflect.getMetadata('consumers', controller) || [],
+  };
+}
+
+main();
