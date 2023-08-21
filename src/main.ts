@@ -38,7 +38,7 @@ import { ConsumerMeta } from './types';
       const foundConsumer = consumers.find((x) => x.subject === shortSubject);
       if (!foundConsumer) return;
 
-      controller[foundConsumer.methodName](payload);
+      controller[foundConsumer.methodName](message, payload);
     });
 
     console.log(`Listening on subject ${subjectPrefix}.>`);

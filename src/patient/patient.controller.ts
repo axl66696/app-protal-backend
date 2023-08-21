@@ -1,6 +1,7 @@
 import { Json } from 'src/types';
 import { Consumer, Controller } from '../decorators';
 import { PatientService } from './patient.service';
+import { JsMsg } from 'nats';
 
 @Controller('patient')
 export default class PatientController {
@@ -8,7 +9,14 @@ export default class PatientController {
     this.patientService = new PatientService();
   }
   @Consumer('create')
-  createPatient(message: Json) {
-    this.patientService.processMessage(message);
+  createPatient(message: JsMsg, payload: Json) {
+    try {
+      this.patientService.processMessage(payload);
+
+      message.ack();
+    } catch (error) {
+      console.log('Error processing patient.create: ', error);
+      message.nak();
+    }
   }
 }

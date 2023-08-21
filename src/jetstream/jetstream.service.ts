@@ -44,13 +44,7 @@ export class NatsJetStreamServer
         const payload = this.#codec.decode(message.data);
         console.log(`Got message from subject ${message.subject}: ${payload}`);
 
-        const ackStatus = await message.ackAck();
-
-        if (ackStatus) {
-          callback(message, payload);
-        } else {
-          message.nak();
-        }
+        callback(message, payload);
       } catch (error) {
         console.error(
           `Error getting message of subject ${message.subject}: `,
