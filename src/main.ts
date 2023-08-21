@@ -33,7 +33,7 @@ import { ConsumerMeta } from './types';
     const consumers =
       (Reflect.getMetadata('consumers', controller) as ConsumerMeta[]) || [];
 
-    appService.subscribeMessage('OPD', subjectPrefix, (message, payload) => {
+    appService.subscribeMessage(subjectPrefix, (message, payload) => {
       const shortSubject = message.subject.split(`${subjectPrefix}.`)[1];
       const foundConsumer = consumers.find((x) => x.subject === shortSubject);
       if (!foundConsumer) return;

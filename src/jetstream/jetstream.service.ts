@@ -16,8 +16,9 @@ export class NatsJetStreamServer
   implements CustomTransportStrategy
 {
   #nc: NatsConnection;
-  #codec: Codec<Json> = JSONCodec();
   #js!: JetStreamClient;
+  #streamName = 'OPD';
+  #codec: Codec<Json> = JSONCodec();
 
   async listen(callback: () => void) {
     await this.connect();
@@ -32,11 +33,10 @@ export class NatsJetStreamServer
   }
 
   async subscribeMessage(
-    stream: string,
     name: string,
     callback: (message: JsMsg, payload: Json) => void,
   ) {
-    const consumer = await this.#js.consumers.get(stream, name);
+    const consumer = await this.#js.consumers.get(this.#streamName, name);
     const messages = await consumer.consume();
 
     for await (const message of messages) {
