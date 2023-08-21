@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { NatsJetStreamServer } from './jetstream/jetstream.service';
+import { NatsJetStreamServer } from './services/jetstream.service';
 
 @Module({
   imports: [],

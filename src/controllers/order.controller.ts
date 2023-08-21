@@ -1,6 +1,6 @@
 import { Json } from 'src/types';
 import { Consumer, Controller } from '../decorators';
-import { OrderService } from './order.service';
+import { OrderService } from '../services/order.service';
 import { JsMsg } from 'nats';
 
 @Controller('order')
