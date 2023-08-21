@@ -1,1 +1,1 @@
-export type Json<T extends Object = Object> = string | T | number | boolean;
+export type Json<T extends object = object> = string | T | number | boolean;

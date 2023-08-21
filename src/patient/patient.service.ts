@@ -1,4 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Json } from 'src/types';
 
-@Injectable()
-export class PatientService {}
+export class PatientService {
+  processMessage(message: Json) {
+    console.log('PatientService processing: ', message);
+  }
+}

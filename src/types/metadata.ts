@@ -1,4 +1,4 @@
 export interface ConsumerMeta {
-    subject: string;
-    methodName: string;
+  subject: string;
+  methodName: string;
 }

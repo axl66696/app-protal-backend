@@ -4,11 +4,10 @@ import {
   Codec,
   JSONCodec,
   JetStreamClient,
-  JetStreamManager,
+  JsMsg,
   NatsConnection,
   connect,
 } from 'nats';
-import { NatsJetStreamServerOptions } from './jetstream.interface';
 import { Json } from 'src/types';
 
 @Injectable()
@@ -18,48 +17,45 @@ export class NatsJetStreamServer
 {
   #nc: NatsConnection;
   #codec: Codec<Json> = JSONCodec();
-  #jsm!: JetStreamManager;
   #js!: JetStreamClient;
-  options!: NatsJetStreamServerOptions;
 
-  // 監聽
   async listen(callback: () => void) {
     await this.connect();
     callback();
   }
 
   async connect() {
-    if (!this.#nc) {
-      this.#nc = await connect(this.options.connectionOptions);
-      if (this.options.connectionOptions.connectedHook) {
-        this.options.connectionOptions.connectedHook(this.#nc);
-      }
-      this.#jsm = await this.#nc.jetstreamManager();
-      this.#js = this.#nc.jetstream();
-    }
+    if (this.#nc) return;
+
+    this.#nc = await connect({ servers: 'localhost:4222' });
+    this.#js = this.#nc.jetstream();
   }
 
   async subscribeMessage(
     stream: string,
     name: string,
-    callback: (payload: Json) => void,
+    callback: (message: JsMsg, payload: Json) => void,
   ) {
     const consumer = await this.#js.consumers.get(stream, name);
     const messages = await consumer.consume();
+
     for await (const message of messages) {
       try {
         const payload = this.#codec.decode(message.data);
-        console.log(payload);
-        console.log(`consumer fetch: ${message.subject}`);
+        console.log(`Got message from subject ${message.subject}: ${payload}`);
+
         const ackStatus = await message.ackAck();
 
         if (ackStatus) {
-          callback(payload);
+          callback(message, payload);
         } else {
           message.nak();
         }
       } catch (error) {
-        console.error(error);
+        console.error(
+          `Error while getting message of subject ${message.subject}: `,
+          error,
+        );
       }
     }
   }
@@ -72,9 +68,11 @@ export class NatsJetStreamServer
   async publishMessage(subject: string, payload: any) {
     try {
       await this.#js.publish(subject, this.#codec.encode(payload));
-      console.log('發送成功');
-    } catch (err) {
-      console.log('發送失敗');
+    } catch (error) {
+      console.log(
+        `Error while publishing message of subject ${subject}: `,
+        error,
+      );
     }
   }
 }
