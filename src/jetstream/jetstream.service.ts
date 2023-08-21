@@ -53,7 +53,7 @@ export class NatsJetStreamServer
         }
       } catch (error) {
         console.error(
-          `Error while getting message of subject ${message.subject}: `,
+          `Error getting message of subject ${message.subject}: `,
           error,
         );
       }
@@ -69,10 +69,7 @@ export class NatsJetStreamServer
     try {
       await this.#js.publish(subject, this.#codec.encode(payload));
     } catch (error) {
-      console.log(
-        `Error while publishing message of subject ${subject}: `,
-        error,
-      );
+      console.log(`Error publishing message of subject ${subject}: `, error);
     }
   }
 }

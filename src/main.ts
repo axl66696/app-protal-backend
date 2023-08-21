@@ -4,7 +4,7 @@ import { NatsJetStreamServer } from './jetstream/jetstream.service';
 import { readdirSync } from 'fs';
 import { ConsumerMeta } from './types';
 
-async function bootstrap() {
+(async () => {
   const app = await NestFactory.createApplicationContext(AppModule);
   const appService = app.get(NatsJetStreamServer);
   await appService.connect();
@@ -12,15 +12,19 @@ async function bootstrap() {
   const srcFiles = readdirSync(__dirname);
   const folders = srcFiles.filter((filename) => !filename.includes('.'));
 
-  folders.forEach(async (folder) => {
+  const controllerFiles = folders.map((folder) => {
     const folderDir = `${__dirname}/${folder}`;
     const files = readdirSync(folderDir);
     const controllerFile = files.find(
       (file) => file.includes('controller') && !file.includes('controller.d'),
     );
-    if (!controllerFile) return;
 
-    const ControllerModule = await import(`${folderDir}/${controllerFile}`);
+    return controllerFile && `${__dirname}/${folder}/${controllerFile}`;
+  });
+  const foundControllerFiles = controllerFiles.filter((x) => x);
+
+  foundControllerFiles.forEach(async (file) => {
+    const ControllerModule = await import(file);
     const ControllerClass = ControllerModule.default;
     if (!ControllerClass) return;
 
@@ -39,5 +43,4 @@ async function bootstrap() {
 
     console.log(`Listening on subject ${subjectPrefix}.>`);
   });
-}
-bootstrap();
+})();
