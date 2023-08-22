@@ -1,4 +1,4 @@
-import { ControllerMetadata } from '../metadata';
+import { ControllerMetadata } from '../interface';
 
 export class ControllerService {
   getControllerMetadata(controller: any): ControllerMetadata {

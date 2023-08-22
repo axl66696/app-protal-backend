@@ -6,17 +6,19 @@ import {
   NatsConnection,
   connect,
 } from 'nats';
+import { NatsServerConfig } from 'src/interface';
 
 export class NatsJetStreamServer {
   #nc: NatsConnection;
   #js!: JetStreamClient;
-  #streamName = 'OPD';
   #codec: Codec<any> = JSONCodec();
+
+  constructor(private readonly serverConfig: NatsServerConfig) {}
 
   async connect() {
     if (this.#nc) return;
 
-    this.#nc = await connect({ servers: 'localhost:4222' });
+    this.#nc = await connect({ servers: this.serverConfig.servers });
     this.#js = this.#nc.jetstream();
   }
 
@@ -24,7 +26,10 @@ export class NatsJetStreamServer {
     name: string,
     callback: (message: JsMsg, payload: any) => void,
   ) {
-    const consumer = await this.#js.consumers.get(this.#streamName, name);
+    const consumer = await this.#js.consumers.get(
+      this.serverConfig.stream,
+      name,
+    );
     const messages = await consumer.consume();
 
     for await (const message of messages) {

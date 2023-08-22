@@ -5,6 +5,7 @@
   "main": "src/main.ts",
   "scripts": {
     "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node .\"",
+    "start:prod": "tsc && node ./dist/main.js",
     "build": "tsc"
   },
   "author": "",

@@ -2,7 +2,10 @@ import { NatsJetStreamServer } from './services/jetstream.service';
 import { ControllerService } from './services/controller.service';
 
 (async () => {
-  const jetStreamServer = new NatsJetStreamServer();
+  const jetStreamServer = new NatsJetStreamServer({
+    servers: 'localhost:4222',
+    stream: 'OPD',
+  });
   await jetStreamServer.connect();
 
   const controllerService = new ControllerService();
