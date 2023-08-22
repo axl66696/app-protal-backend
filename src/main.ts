@@ -32,7 +32,7 @@ async function main() {
 
 function findControllerFiles() {
   const controllerFiles = readdirSync(`${__dirname}/controllers`)
-    .filter((file) => file.endsWith('controller.js'))
+    .filter((file) => file.endsWith('.controller.js'))
     .map((file) => `${__dirname}/controllers/${file}`);
 
   return controllerFiles;
