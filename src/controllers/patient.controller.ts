@@ -1,5 +1,5 @@
 import { Subscriber, Controller } from '../decorators';
-import { PatientService } from '../services/patient.service';
+import { PatientService } from '@his-model/nats-oriented-services';
 import { JsMsg } from 'nats';
 
 @Controller('patient')

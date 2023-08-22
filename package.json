@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@his-model/nats-oriented-services": "git+https://gitlab.aservice.com.tw/hpc-dev/model/nats-oriented-services.git",
     "nats": "^2.16.0",
     "nodemon": "^3.0.1",
     "reflect-metadata": "^0.1.13",
