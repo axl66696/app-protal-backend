@@ -1,4 +1,4 @@
-import { ControllerMetadata } from 'src/types';
+import { ControllerMetadata } from '../types';
 
 export class ControllerService {
   getControllerMetadata(controller: any): ControllerMetadata {
