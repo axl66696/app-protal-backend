@@ -1,9 +1,9 @@
-export interface ControllerMetadata {
-  subjectPrefix: string;
-  consumers: ConsumerMeta[];
-}
-
-export interface ConsumerMeta {
+export interface SubscriberMetadata {
   subject: string;
   methodName: string;
+}
+
+export interface ControllerMetadata {
+  subjectPrefix: string;
+  subscribers: SubscriberMetadata[];
 }

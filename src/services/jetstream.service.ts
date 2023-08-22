@@ -1,5 +1,3 @@
-import { Injectable } from '@nestjs/common';
-import { CustomTransportStrategy, Server } from '@nestjs/microservices';
 import {
   Codec,
   JSONCodec,
@@ -8,22 +6,12 @@ import {
   NatsConnection,
   connect,
 } from 'nats';
-import { Json } from 'src/types';
 
-@Injectable()
-export class NatsJetStreamServer
-  extends Server
-  implements CustomTransportStrategy
-{
+export class NatsJetStreamServer {
   #nc: NatsConnection;
   #js!: JetStreamClient;
   #streamName = 'OPD';
-  #codec: Codec<Json> = JSONCodec();
-
-  async listen(callback: () => void) {
-    await this.connect();
-    callback();
-  }
+  #codec: Codec<any> = JSONCodec();
 
   async connect() {
     if (this.#nc) return;
@@ -32,9 +20,9 @@ export class NatsJetStreamServer
     this.#js = this.#nc.jetstream();
   }
 
-  async subscribeMessage(
+  async subscribe(
     name: string,
-    callback: (message: JsMsg, payload: Json) => void,
+    callback: (message: JsMsg, payload: any) => void,
   ) {
     const consumer = await this.#js.consumers.get(this.#streamName, name);
     const messages = await consumer.consume();
@@ -54,12 +42,7 @@ export class NatsJetStreamServer
     }
   }
 
-  async close() {
-    await this.#nc.drain();
-    this.#nc = undefined;
-  }
-
-  async publishMessage(subject: string, payload: any) {
+  async publish(subject: string, payload: any) {
     try {
       await this.#js.publish(subject, this.#codec.encode(payload));
     } catch (error) {

@@ -1,15 +1,14 @@
-import { Json } from 'src/types';
-import { Consumer, Controller } from '../decorators';
+import { Subscriber, Controller } from '../decorators';
 import { OrderService } from '../services/order.service';
 import { JsMsg } from 'nats';
 
 @Controller('order')
-export default class OrderController {
-  constructor(private readonly orderService: OrderService) {
-    this.orderService = new OrderService();
-  }
-  @Consumer('create')
-  createOrder(message: JsMsg, payload: Json) {
+export class OrderController {
+  constructor(
+    private readonly orderService: OrderService = new OrderService(),
+  ) {}
+  @Subscriber('create')
+  createOrder(message: JsMsg, payload: any) {
     try {
       this.orderService.processMessage(payload);
 

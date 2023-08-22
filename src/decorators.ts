@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 export function Controller(subjectPrefix: string) {
   // eslint-disable-next-line @typescript-eslint/ban-types
   return function (constructor: Function) {
@@ -5,10 +7,10 @@ export function Controller(subjectPrefix: string) {
   };
 }
 
-export function Consumer(subject = '') {
+export function Subscriber(subject = '') {
   return function (target: any, propertyKey: string) {
-    const consumers = Reflect.getMetadata('consumers', target) || [];
-    consumers.push({ subject, methodName: propertyKey });
-    Reflect.defineMetadata('consumers', consumers, target);
+    const subscribers = Reflect.getMetadata('subscribers', target) || [];
+    subscribers.push({ subject, methodName: propertyKey });
+    Reflect.defineMetadata('subscribers', subscribers, target);
   };
 }
