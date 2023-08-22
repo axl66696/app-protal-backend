@@ -2,13 +2,15 @@
   "compilerOptions": {
     "module": "CommonJS",
     "target": "ES2022",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "strict": false,
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "outDir": "./dist",
-    "declaration": true,
-    "allowSyntheticDefaultImports": true
+    "baseUrl": "./",
+    "declaration": true
   }
 }
