@@ -7,6 +7,7 @@ export class OrderController {
   constructor(
     private readonly orderService: OrderService = new OrderService(),
   ) {}
+
   @Subscriber('create')
   createOrder(message: JsMsg, payload: any) {
     try {

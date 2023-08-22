@@ -7,6 +7,7 @@ export class PatientController {
   constructor(
     private readonly patientService: PatientService = new PatientService(),
   ) {}
+
   @Subscriber('create')
   createPatient(message: JsMsg, payload: any) {
     try {
