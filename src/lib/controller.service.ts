@@ -1,4 +1,4 @@
-import { ControllerMetadata } from '../interface';
+import { ControllerMetadata } from './interface';
 
 export class ControllerService {
   async getAllControllers() {
@@ -9,8 +9,9 @@ export class ControllerService {
   getControllerMetadata(controller: any): ControllerMetadata {
     const ControllerClass = controller.constructor;
     return {
-      subjectPrefix: Reflect.getMetadata('subjectPrefix', ControllerClass),
+      consumer: Reflect.getMetadata('consumer', ControllerClass),
       subscribers: Reflect.getMetadata('subscribers', controller) || [],
+      repliers: Reflect.getMetadata('repliers', controller) || [],
     };
   }
 }

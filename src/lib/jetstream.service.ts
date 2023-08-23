@@ -3,22 +3,23 @@ import {
   JSONCodec,
   JetStreamClient,
   JsMsg,
+  Msg,
   NatsConnection,
   connect,
 } from 'nats';
-import { NatsServerConfig } from 'src/interface';
+import { NatsServerConfig } from 'src/lib/interface';
 
 export class NatsJetStreamServer {
   #nc: NatsConnection;
   #js!: JetStreamClient;
-  #codec: Codec<any> = JSONCodec();
+  #jsonCodec: Codec<any> = JSONCodec();
 
   constructor(private readonly serverConfig: NatsServerConfig) {}
 
   async connect() {
     if (this.#nc) return;
 
-    this.#nc = await connect({ servers: this.serverConfig.servers });
+    this.#nc = await connect(this.serverConfig);
     this.#js = this.#nc.jetstream();
   }
 
@@ -34,7 +35,7 @@ export class NatsJetStreamServer {
 
     for await (const message of messages) {
       try {
-        const payload = this.#codec.decode(message.data);
+        const payload = this.#jsonCodec.decode(message.data);
         console.log(`Got message from subject ${message.subject}: ${payload}`);
 
         callback(message, payload);
@@ -49,9 +50,23 @@ export class NatsJetStreamServer {
 
   async publish(subject: string, payload: any) {
     try {
-      await this.#js.publish(subject, this.#codec.encode(payload));
+      await this.#js.publish(subject, this.#jsonCodec.encode(payload));
     } catch (error) {
       console.log(`Error publishing message of subject ${subject}: `, error);
     }
+  }
+
+  reply(
+    subject: string,
+    callback: (message: Msg, payload: any, jsonCodec: Codec<any>) => void,
+  ) {
+    this.#nc.subscribe(subject, {
+      callback: (_err, message) => {
+        const payload = this.#jsonCodec.decode(message.data);
+        console.log(`Got request from subject ${message.subject}: ${payload}`);
+
+        callback(message, payload, this.#jsonCodec);
+      },
+    });
   }
 }

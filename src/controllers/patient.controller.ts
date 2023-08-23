@@ -1,4 +1,4 @@
-import { Subscriber, Controller } from '../decorators';
+import { Subscriber, Controller } from '../lib/decorators';
 import { PatientService } from '@his-model/nats-oriented-services';
 import { JsMsg } from 'nats';
 

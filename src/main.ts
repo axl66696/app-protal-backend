@@ -1,29 +1,42 @@
-import { NatsJetStreamServer } from './services/jetstream.service';
-import { ControllerService } from './services/controller.service';
+import { NatsJetStreamServer } from './lib/jetstream.service';
+import { ControllerService } from './lib/controller.service';
+import { serverConfig } from './server.config';
 
-(async () => {
-  const jetStreamServer = new NatsJetStreamServer({
-    servers: 'localhost:4222',
-    stream: 'OPD',
-  });
-  await jetStreamServer.connect();
+export class NatsServer {
+  async bootstrap() {
+    const jetStreamServer = new NatsJetStreamServer(serverConfig);
+    await jetStreamServer.connect();
 
-  const controllerService = new ControllerService();
+    const controllerService = new ControllerService();
 
-  const controllers = await controllerService.getAllControllers();
-  controllers.forEach((controller) => {
-    const { subjectPrefix, subscribers } =
-      controllerService.getControllerMetadata(controller);
+    const controllers = await controllerService.getAllControllers();
+    controllers.forEach((controller) => {
+      const { consumer, subscribers, repliers } =
+        controllerService.getControllerMetadata(controller);
 
-    jetStreamServer.subscribe(subjectPrefix, (message, payload) => {
-      const foundSubscriber = subscribers.find(
-        (x) => `${subjectPrefix}.${x.subject}` === message.subject,
-      );
-      if (!foundSubscriber) return;
+      jetStreamServer.subscribe(consumer, (message, payload) => {
+        const foundSubscriber = subscribers.find(
+          (x) => `${consumer}.${x.subject}` === message.subject,
+        );
 
-      controller[foundSubscriber.methodName](message, payload);
+        if (foundSubscriber) {
+          controller[foundSubscriber.methodName](message, payload);
+        } else message.ack();
+      });
+
+      console.log(`Listening on subject ${consumer}.>`);
+
+      repliers.forEach(({ subject, methodName }) => {
+        const fullSubject = `${consumer}.${subject}`;
+        jetStreamServer.reply(fullSubject, (message, payload, jsonCodec) => {
+          controller[methodName](message, payload, jsonCodec);
+        });
+
+        console.log(`Replying on subject ${fullSubject}`);
+      });
     });
+  }
+}
 
-    console.log(`Listening on subject ${subjectPrefix}.>`);
-  });
-})();
+const natsServer = new NatsServer();
+natsServer.bootstrap();
