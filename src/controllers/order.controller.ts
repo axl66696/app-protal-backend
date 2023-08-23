@@ -22,12 +22,8 @@ export class OrderController {
 
   @Replier('list')
   getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
-    this.orderService.processMessage(payload);
+    const orders = this.orderService.getAllOrders();
 
-    const response = [
-      { id: 1, name: 'order1' },
-      { id: 2, name: 'order2' },
-    ];
-    message.respond(jsonCodec.encode(response));
+    message.respond(jsonCodec.encode(orders));
   }
 }
