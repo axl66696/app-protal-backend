@@ -1,15 +1,18 @@
-import { NatsJetStreamServer } from './lib/jetstream.service';
-import { ControllerService } from './lib/controller.service';
+import { ControllerService, JetStreamService } from '@his-base/jetstream';
 import { serverConfig } from './server.config';
 
 export class NatsServer {
   async bootstrap() {
-    const jetStreamServer = new NatsJetStreamServer(serverConfig);
+    const jetStreamServer = new JetStreamService(serverConfig);
     await jetStreamServer.connect();
 
     const controllerService = new ControllerService();
 
-    const controllers = await controllerService.getAllControllers();
+    const controllerFiles = await import('./controllers');
+    const controllers = Object.values(controllerFiles).map(
+      (Class: any) => new Class(),
+    );
+
     controllers.forEach((controller) => {
       const { consumer, subscribers, repliers } =
         controllerService.getControllerMetadata(controller);

@@ -1,4 +1,4 @@
-import { NatsServerConfig } from './lib/interface';
+import { NatsServerConfig } from '@his-base/jetstream';
 import 'dotenv/config';
 
 export const serverConfig: NatsServerConfig = {

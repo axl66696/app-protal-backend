@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@his-base/jetstream": "git+https://gitlab.com/NiYaZhen/jetstream.git",
     "@his-model/nats-oriented-services": "git+https://gitlab.aservice.com.tw/hpc-dev/model/nats-oriented-services.git",
     "dotenv": "^16.3.1",
     "nats": "^2.16.0",

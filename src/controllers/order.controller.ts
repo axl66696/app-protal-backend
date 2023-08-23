@@ -1,4 +1,4 @@
-import { Subscriber, Controller, Replier } from '../lib/decorators';
+import { Controller, Replier, Subscriber } from '@his-base/jetstream';
 import { OrderService } from '@his-model/nats-oriented-services';
 import { Codec, JsMsg, Msg } from 'nats';
 
