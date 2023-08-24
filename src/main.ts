@@ -1,18 +1,26 @@
 import { ControllerService, JetStreamService } from '@his-base/jetstream';
 import { serverConfig } from './server.config';
+import { MongoBaseService } from '@his-base/mongo-base';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class NatsServer {
   async bootstrap() {
     const jetStreamServer = new JetStreamService(serverConfig);
     await jetStreamServer.connect();
 
-    const controllerService = new ControllerService();
-
-    const controllerFiles = await import('./controllers');
-    const controllers = Object.values(controllerFiles).map(
-      (Class: any) => new Class(),
+    const mongoService = new MongoBaseService(
+      'mongodb://localhost:27017',
+      'OPD',
     );
 
+    const controllerService = new ControllerService(mongoService);
+
+    const controllers = await controllerService.getAllControllers(
+      `${__dirname}/controllers`,
+    );
     controllers.forEach((controller) => {
       const { consumer, subscribers, repliers } =
         controllerService.getControllerMetadata(controller);

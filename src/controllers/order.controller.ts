@@ -1,9 +1,12 @@
 import { Controller, Replier, Subscriber } from '@his-base/jetstream';
+import { MongoBaseService } from '@his-base/mongo-base';
 import { OrderService } from '@his-model/nats-oriented-services';
 import { Codec, JsMsg, Msg } from 'nats';
 
 @Controller('order')
 export class OrderController {
+  mongoService: MongoBaseService;
+
   constructor(
     private readonly orderService: OrderService = new OrderService(),
   ) {}
@@ -21,8 +24,12 @@ export class OrderController {
   }
 
   @Replier('list')
-  getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
-    const orders = this.orderService.getAllOrders();
+  async getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
+    const orders = await this.mongoService
+      .collections('movie')
+      .findDocument('64e6d570159e1a47a6f807e6');
+
+    console.log(orders);
 
     message.respond(jsonCodec.encode(orders));
   }

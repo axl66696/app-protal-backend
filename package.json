@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@his-base/jetstream": "git+https://gitlab.aservice.com.tw/hpc-dev/base/jetstream.git",
+    "@his-base/mongo-base": "git+https://gitlab.aservice.com.tw/HPC-HIS/base/mongobase.git#develop",
     "@his-model/nats-oriented-services": "git+https://gitlab.aservice.com.tw/hpc-dev/model/nats-oriented-services.git",
     "dotenv": "^16.3.1",
     "nats": "^2.16.0",
