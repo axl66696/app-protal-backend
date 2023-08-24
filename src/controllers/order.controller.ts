@@ -25,9 +25,7 @@ export class OrderController {
 
   @Replier('list')
   async getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
-    const orders = await this.mongoService
-      .collections('movie')
-      .findDocument('64e6d570159e1a47a6f807e6');
+    const orders = await this.orderService.getAllOrders();
 
     console.log(orders);
 
