@@ -2,10 +2,11 @@
   "name": "nats-oriented-backend",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "src/main.ts",
   "scripts": {
-    "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node .\"",
-    "start:prod": "tsc && node ./dist/main.js",
+    "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node src/main\"",
+    "start:prod": "tsc && node --loader ts-node/esm ./dist/src/main",
     "build": "tsc"
   },
   "author": "",

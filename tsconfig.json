@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
+    "module": "ES2022",
     "target": "ES2022",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -12,5 +12,9 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "declaration": true
+  },
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node"
   }
 }
