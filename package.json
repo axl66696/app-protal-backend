@@ -6,7 +6,7 @@
   "main": "src/main.ts",
   "scripts": {
     "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node src/main\"",
-    "start:prod": "tsc && node --loader ts-node/esm ./dist/src/main",
+    "start:prod": "tsc && node --loader ts-node/esm ./dist/main",
     "build": "tsc"
   },
   "author": "",
