@@ -16,7 +16,10 @@ export class NatsServer {
       'OPD',
     );
 
-    const controllerService = new ControllerService(mongoService);
+    const controllerService = new ControllerService(
+      mongoService,
+      jetStreamServer,
+    );
 
     const controllers = await controllerService.getAllControllers(
       `${__dirname}/controllers`,
