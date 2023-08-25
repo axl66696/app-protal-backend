@@ -35,7 +35,7 @@ export class NatsServer {
 
         if (foundSubscriber) {
           controller[foundSubscriber.methodName](message, payload);
-        } else message.ack();
+        } else message.nak();
       });
 
       console.log(`Listening on subject ${consumer}.>`);
