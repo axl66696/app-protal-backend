@@ -1,17 +1,15 @@
 import {
   Controller,
-  JetStreamService,
+  JetStreamServiceProvider,
   Replier,
   Subscriber,
 } from '@his-base/jetstream';
-import { MongoBaseService } from '@his-base/mongo-base';
 import { OrderService } from '@his-model/nats-oriented-services';
 import { Codec, JsMsg, Msg } from 'nats';
 
 @Controller('order')
 export class OrderController {
-  mongoService: MongoBaseService;
-  jetStreamService: JetStreamService;
+  jetStreamService = JetStreamServiceProvider.get();
 
   constructor(
     private readonly orderService: OrderService = new OrderService(),

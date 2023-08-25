@@ -1,6 +1,8 @@
-import { ControllerService, JetStreamService } from '@his-base/jetstream';
+import {
+  ControllerService,
+  JetStreamServiceProvider,
+} from '@his-base/jetstream';
 import { serverConfig } from './server.config';
-import { MongoBaseService } from '@his-base/mongo-base';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -8,18 +10,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class NatsServer {
   async bootstrap() {
-    const jetStreamServer = new JetStreamService(serverConfig);
-    await jetStreamServer.connect();
+    await JetStreamServiceProvider.initialize(serverConfig);
+    const jetStreamServer = JetStreamServiceProvider.get();
 
-    const mongoService = new MongoBaseService(
-      'mongodb://localhost:27017',
-      'OPD',
-    );
-
-    const controllerService = new ControllerService(
-      mongoService,
-      jetStreamServer,
-    );
+    const controllerService = new ControllerService();
 
     const controllers = await controllerService.getAllControllers(
       `${__dirname}/controllers`,

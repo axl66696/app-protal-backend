@@ -1,7 +1,7 @@
-import { NatsServerConfig } from '@his-base/jetstream';
+import { JetStreamConfig } from '@his-base/jetstream';
 import 'dotenv/config';
 
-export const serverConfig: NatsServerConfig = {
+export const serverConfig: JetStreamConfig = {
   servers: process.env.NATS_SERVERS
     ? process.env.NATS_SERVERS.split(',')
     : 'nats://localhost:4222',
