@@ -5,6 +5,7 @@ import {
 import { serverConfig } from './server.config';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { MongoServiceProvider } from '@his-base/mongo-base';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -12,6 +13,8 @@ export class NatsServer {
   async bootstrap() {
     await JetStreamServiceProvider.initialize(serverConfig);
     const jetStreamServer = JetStreamServiceProvider.get();
+
+    MongoServiceProvider.setConfig(serverConfig.dbUrl, serverConfig.dbName);
 
     const controllerService = new ControllerService();
 
