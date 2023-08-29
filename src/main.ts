@@ -6,6 +6,7 @@ import { serverConfig } from './server.config';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MongoServiceProvider } from '@his-base/mongo-base';
+import { compareSubject } from './utils';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -30,8 +31,8 @@ export class NatsServer {
         controllerService.getControllerMetadata(controller);
 
       jetStreamServer.subscribe(consumer, (message, payload) => {
-        const foundSubscriber = subscribers.find(
-          (x) => `${consumer}.${x.subject}` === message.subject,
+        const foundSubscriber = subscribers.find((x) =>
+          compareSubject(`${consumer}.${x.subject}`, message.subject),
         );
 
         if (foundSubscriber) {

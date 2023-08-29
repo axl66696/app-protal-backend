@@ -26,7 +26,19 @@ export class OrderController {
         this.jetStreamService.publish('order.create', 'Hello Again');
       }, 2000);
     } catch (error) {
-      console.log('Error processing order.create: ', error);
+      console.error('Error processing order.create: ', error);
+      message.nak();
+    }
+  }
+
+  @Subscriber('*.*.update')
+  updateOrder(message: JsMsg, payload: any) {
+    try {
+      console.log('Processing time update', payload);
+
+      message.ack();
+    } catch (error) {
+      console.error('Error processing order.*.*.update: ', error);
       message.nak();
     }
   }

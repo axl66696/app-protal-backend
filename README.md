@@ -80,7 +80,8 @@ export class OrderController {
 ## 訂閱者設定 controller.ts
 
 subscriber 為訂閱的主題，如 order.create、order.create.new  
-直接將 .加在後面即可使用 @Subscriber('create.new')
+直接將 .加在後面即可使用 @Subscriber('create.new')<br>
+也可使用通配符\*/>
 
 ```typescript
   @Subscriber('create')
@@ -113,7 +114,8 @@ subscriber 為訂閱的主題，如 order.create、order.create.new
 ## Reply 設定 controller.ts
 
 Replier 為給 Reply 使用的主題，如 order.list、order.list.new  
-直接將 .加在後面即可使用 @Replier('list.new')
+直接將 .加在後面即可使用 @Replier('list.new')<br>
+也可使用通配符\*/>
 
 ```typescript
   @Replier('list')
