@@ -10,12 +10,16 @@ import { MongoServiceProvider } from '@his-base/mongo-base';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export class NatsServer {
-  async bootstrap() {
+  async #initialize() {
     await JetStreamServiceProvider.initialize(serverConfig);
-    const jetStreamServer = JetStreamServiceProvider.get();
 
     MongoServiceProvider.setConfig(serverConfig.dbUrl, serverConfig.dbName);
+  }
 
+  async bootstrap() {
+    await this.#initialize();
+
+    const jetStreamServer = JetStreamServiceProvider.get();
     const controllerService = new ControllerService();
 
     const controllers = await controllerService.getAllControllers(
