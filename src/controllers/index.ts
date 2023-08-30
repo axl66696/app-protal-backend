@@ -1,2 +1,1 @@
-export * from './order.controller';
-export * from './patient.controller';
+export * from './order.controller.js';

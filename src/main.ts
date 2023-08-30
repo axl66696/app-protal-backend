@@ -2,11 +2,11 @@ import {
   ControllerService,
   JetStreamServiceProvider,
 } from '@his-base/jetstream';
-import { serverConfig } from './server.config';
+import { serverConfig } from './server.config.js';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { MongoServiceProvider } from '@his-base/mongo-base';
-import { compareSubject } from './utils';
+import { compareSubject } from './utils.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

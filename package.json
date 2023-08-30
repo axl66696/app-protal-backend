@@ -6,14 +6,14 @@
   "main": "src/main.ts",
   "scripts": {
     "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node src/main\"",
-    "start:prod": "tsc && node --loader ts-node/esm ./dist/main",
+    "start:prod": "tsc && node --es-module-specifier-resolution=node ./dist/main",
     "build": "tsc"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@his-base/jetstream": "git+https://gitlab.aservice.com.tw/hpc-dev/base/jetstream.git",
-    "@his-base/mongo-base": "git+https://gitlab.aservice.com.tw/hpc-his/base/mongobase.git#develop",
+    "@his-base/mongo-base": "git+https://gitlab.aservice.com.tw/hpc-his/base/mongobase.git",
     "@his-model/nats-oriented-services": "git+https://gitlab.aservice.com.tw/hpc-dev/model/nats-oriented-services.git",
     "dotenv": "^16.3.1",
     "nats": "^2.16.0",
