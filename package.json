@@ -5,8 +5,8 @@
   "type": "module",
   "main": "src/main.ts",
   "scripts": {
-    "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node src/main\"",
-    "start:prod": "tsc && node --es-module-specifier-resolution=node ./dist/main",
+    "start": "nodemon -w \"src/**\" -e ts --exec \"ts-node src/main.ts\"",
+    "start:prod": "tsc && node ./dist/main.js",
     "build": "tsc"
   },
   "author": "",

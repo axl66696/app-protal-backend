@@ -24,7 +24,7 @@ export class NatsServer {
     const controllerService = new ControllerService();
 
     const controllers = await controllerService.getAllControllers(
-      `${__dirname}/controllers`,
+      `${__dirname}/controllers/index.js`,
     );
     controllers.forEach((controller) => {
       const { consumer, subscribers, repliers } =
