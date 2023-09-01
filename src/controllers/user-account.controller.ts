@@ -4,12 +4,14 @@ import {
   Replier,
   Subscriber,
 } from '@his-base/jetstream';
+import { MongoBaseService } from '@his-base/mongo-base';
 import { OrderService } from '@his-model/nats-oriented-services';
 import { Codec, JsMsg, Msg } from 'nats';
-
 @Controller('userAccount')
 export class UserAccountController {
   jetStreamService = JetStreamServiceProvider.get();
+
+  mongoDB = new MongoBaseService("mongodb://localhost:27017", "UserDatabase");
 
   constructor(
     private readonly orderService: OrderService = new OrderService(),
@@ -18,13 +20,12 @@ export class UserAccountController {
   @Subscriber('update')
   createOrder(message: JsMsg, payload: any) {
     try {
-      this.orderService.processMessage(payload);
+
+      const { _id, ...ResetData } = payload;
 
       message.ack();
-
-      setTimeout(() => {
-        this.jetStreamService.publish('order.create', 'Hello Again');
-      }, 2000);
+      this.mongoDB.collections("user").collection.updateOne({userCode: payload.userCode}, {$set:ResetData});
+   
     } catch (error) {
       console.error('Error processing order.create: ', error);
       message.nak();
