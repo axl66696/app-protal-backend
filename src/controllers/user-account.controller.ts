@@ -21,10 +21,11 @@ export class UserAccountController {
   createOrder(message: JsMsg, payload: any) {
     try {
 
-      const { _id, ...ResetData } = payload;
+      /**payload 排除_id  */
+      const { _id, ...resetUserInfo } = payload;
 
       message.ack();
-      this.mongoDB.collections("user").collection.updateOne({userCode: payload.userCode}, {$set:ResetData});
+      this.mongoDB.collections("user").collection.updateOne({userCode: payload.userCode}, {$set:resetUserInfo});
    
     } catch (error) {
       console.error('Error processing order.create: ', error);
