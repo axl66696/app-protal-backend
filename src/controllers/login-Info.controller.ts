@@ -9,12 +9,13 @@ import { MongoBaseService } from "@his-base/mongo-base";
 import { OrderService } from "@his-model/nats-oriented-services";
 import { Codec, JsMsg, Msg } from "nats";
 import { ConsumerOptsBuilderImpl } from "nats/lib/jetstream/types";
+import { UserAccount } from "./types/user-account";
 
 @Controller("loginInfo")
-export class UserController {
+export class LoginInfoController {
   jetStreamService = JetStreamServiceProvider.get();
 
-  mongoDB = new MongoBaseService("mongodb://localhost:27017", "users");
+  mongoDB = new MongoBaseService("mongodb://localhost:27017", "UserDatabase");
   constructor(
     private readonly orderService: OrderService = new OrderService()
   ) {}
@@ -51,26 +52,31 @@ export class UserController {
   @Replier("request")
   async getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
 
-    const userInfo = await this.mongoDB
-      .collections("users")
-      .findDocuments({'userCode':'001-userCode'});
-    console.log("userInfo", userInfo);
-    // 如果payload.userName存在his.mongoDB.collections("users")中，則回傳true，否則回傳false
-    if(payload.userCode  ){
-      return {
-        auth: true,
-        user: {} as any,
-      };
-    }else{
-      return {
-        auth: false,
-      };
+    const getUserInfo = await this.mongoDB
+      .collections("user")
+      .findDocuments({'userCode':payload.userCode,"passwordHash":payload.passwordHash,"orgNo":payload.orgNo});
+    // console.log("userInfo", getUserInfo);
+
+    const userInfo:UserAccount=getUserInfo[0] as unknown as UserAccount
+    console.log(userInfo)
+
+    if(userInfo){
+      const returnMessage = {auth:true,userAccount: userInfo as any,}
+      message.respond(jsonCodec.encode(returnMessage));
     }
-    const returnMessage = {
-      auth: true,
-      user: {} as any,
-    };
-    console.log("returnMessage", returnMessage);
-    message.respond(jsonCodec.encode(returnMessage));
+    else{
+      const returnMessage = {auth:false,user: {} as any,}
+      message.respond(jsonCodec.encode(returnMessage));
+    }
+
+    // 如果payload.userName存在his.mongoDB.collections("users")中，則回傳true，否則回傳false
+
+    
+    // const returnMessage = {
+    //   auth: true,
+    //   user: {} as any,
+    // };
+    // console.log("returnMessage", returnMessage);
+    // message.respond(jsonCodec.encode(returnMessage));
   }
 }
