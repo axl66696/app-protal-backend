@@ -7,7 +7,7 @@ import { Codec, JsMsg, Msg } from 'nats';
 export class AppPageService {
     mongoService: MongoBaseService;
     jetStreamService = JetStreamServiceProvider.get();
-    constructor(mongoService = new MongoBaseService('mongodb://localhost:27017', 'OPD')
+    constructor(mongoService = new MongoBaseService('mongodb://localhost:27017', 'AppPageDatabase')
   ) {this.mongoService = mongoService;}
 
     // 新增資料

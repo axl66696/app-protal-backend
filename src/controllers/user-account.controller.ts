@@ -7,6 +7,7 @@ import {
 import { MongoBaseService } from '@his-base/mongo-base';
 import { OrderService } from '@his-model/nats-oriented-services';
 import { Codec, JsMsg, Msg } from 'nats';
+import { UserAccount } from './types/user-account';
 @Controller('userAccount')
 export class UserAccountController {
   jetStreamService = JetStreamServiceProvider.get();
@@ -17,13 +18,43 @@ export class UserAccountController {
     private readonly orderService: OrderService = new OrderService(),
   ) {}
 
+  @Subscriber('update.many')
+  updateMany(message: JsMsg, payload: any) {
+    try {
+      message.ack();
+      for (const item of payload){
+        const { _id, ...resetUserInfo } = item;
+        this.mongoDB.collections("user").collection.updateMany({userCode:item.userCode},{$set:resetUserInfo});
+      }
+   
+    } catch (error) {
+      console.error('Error processing order.create: ', error);
+      message.nak();
+    }
+  }
+
+  @Subscriber('update.userFavorite')
+  async updateUserFavorite(message: JsMsg, payload: any) {
+    try {
+      /**payload 排除_id  */
+      
+      const { _id, ...resetUserInfo } = payload;
+      message.ack();
+      this.mongoDB.collections("user").collection.updateOne({userCode: payload.userCode}, {$set:resetUserInfo});
+
+    } catch (error) {
+      console.error('Error processing order.create: ', error);
+      message.nak();
+    }
+  }
+
+
   @Subscriber('update')
   createOrder(message: JsMsg, payload: any) {
     try {
 
       /**payload 排除_id  */
       const { _id, ...resetUserInfo } = payload;
-
       message.ack();
       this.mongoDB.collections("user").collection.updateOne({userCode: payload.userCode}, {$set:resetUserInfo});
    
@@ -32,6 +63,7 @@ export class UserAccountController {
       message.nak();
     }
   }
+
 
   @Subscriber('*.*.update')
   updateOrder(message: JsMsg, payload: any) {
@@ -46,11 +78,11 @@ export class UserAccountController {
   }
 
   @Replier('list')
-  async getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
-    const orders = await this.orderService.getAllOrders();
+  async getAllUser(message: Msg, payload: any, jsonCodec: Codec<any>) {
+    const getUsersInfo = await this.mongoDB.collections("user").findDocuments({})
+    console.log("==================================")
+    console.log(getUsersInfo);
 
-    console.log(orders);
-
-    message.respond(jsonCodec.encode(orders));
+    message.respond(jsonCodec.encode(getUsersInfo));
   }
 }

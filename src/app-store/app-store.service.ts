@@ -1,21 +1,19 @@
 import { JetStreamServiceProvider } from '@his-base/jetstream';
-import {MongoServiceProvider } from '@his-base/mongo-base';
+import {MongoBaseService, MongoServiceProvider } from '@his-base/mongo-base';
 import { Injectable } from '@nestjs/common';
 import { Codec, JsMsg, Msg } from 'nats';
 
 @Injectable()
 export class AppStoreService {
-    mongoService = MongoServiceProvider.get();
-    jetStreamService = JetStreamServiceProvider.get();
-  //   constructor(mongoService = new MongoBaseService('mongodb://localhost:27017', 'OPD')
-  // ) {this.mongoService = mongoService;}
-    constructor(){}
-
+  mongoService: MongoBaseService;
+  jetStreamService = JetStreamServiceProvider.get();
+  constructor(mongoService = new MongoBaseService('mongodb://localhost:27017', 'AppStoreDatabase')
+) {this.mongoService = mongoService;}
     // 新增資料
     create(message: JsMsg, payload: any){
     try {
         console.log(payload)
-        this.mongoService.collections('movie').insertDocument(payload)
+        this.mongoService.collections('appStore').insertDocument(payload)
         message.ack();
     } catch (error) {
         console.error('Error processing appStore.create: ', error);
@@ -27,7 +25,7 @@ export class AppStoreService {
     update(message: JsMsg, payload: any){
         try { 
             console.log('Processing time update', payload);
-            this.mongoService.collections('movie').collection.updateOne({_id: payload._id}, {$set:payload})
+            this.mongoService.collections('appStore').collection.updateOne({_id: payload._id}, {$set:payload})
             message.ack();
         } catch (error) {
             console.error('Error processing appStore.update: ', error);
@@ -39,7 +37,7 @@ export class AppStoreService {
     delete(message: JsMsg, payload: any){
     try { 
         console.log('Processing time delete', payload);
-        this.mongoService.collections('movie').collection.deleteOne({_id: payload._id})
+        this.mongoService.collections('appStore').collection.deleteOne({_id: payload._id})
         message.ack();
       } catch (error) {
         console.error('Error processing appStore.delete: ', error);
@@ -48,7 +46,7 @@ export class AppStoreService {
     }    
     // 搜尋所有資料
     async getList(message: Msg, payload: any, jsonCodec: Codec<any>){
-      const appPages = await this.mongoService.collections('movie').findDocuments({})
+      const appPages = await this.mongoService.collections('appStore').findDocuments({})
       console.log(appPages);
       message.respond(jsonCodec.encode(appPages));
     }
@@ -57,7 +55,7 @@ export class AppStoreService {
     async search(message: Msg, payload: any, jsonCodec: Codec<any>){
         try { 
             console.log('Processing time search', payload);
-            const appPages = await this.mongoService.collections('movie').findDocuments({appType: payload})
+            const appPages = await this.mongoService.collections('appStore').findDocuments({appType: payload})
             console.log(appPages)
             message.respond(jsonCodec.encode(appPages));
           } 
@@ -67,7 +65,7 @@ export class AppStoreService {
     }
 
     async get(message: Msg, payload: any, jsonCodec: Codec<any>){
-      const appPages = await this.mongoService.collections('movie').collection.findOne({_id: payload})
+      const appPages = await this.mongoService.collections('appStore').collection.findOne({_id: payload})
       console.log(appPages);
       message.respond(jsonCodec.encode(appPages));
     }

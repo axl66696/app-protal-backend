@@ -1,6 +1,7 @@
+import {userNews} from "./news"
+import {AppStore } from "./app-store"
+
 export class UserAccount {
-
-
   /**
     ** 表格名稱：LoginInfo (login info)
     ** 表格說明：登入資訊
@@ -97,7 +98,12 @@ export class UserAccount {
   /** 使用者系統我的最愛
    * @default []
   */
-  userFavorite: string[] = [];
+  userFavorite: AppStore[] = [];
+
+    /** 使用者最新消息
+   * @default []
+  */
+    userNews: userNews[] = [];
 
   constructor(that?: Partial<UserAccount>) {
     Object.assign(this, structuredClone(that));
