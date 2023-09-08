@@ -5,3 +5,4 @@ export * from "./user-account.controller.js";
 export * from "./app-page.controller.js";
 export * from "./app-store.controller.js"
 export * from "./auth.controller.js";
+export * from "./forget-password.controller.js"

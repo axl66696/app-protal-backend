@@ -63,7 +63,7 @@ export class AppStoreService {
           console.error('Error processing appStore.list: ', error);
         }
     }
-
+    // 搜尋特定資料
     async get(message: Msg, payload: any, jsonCodec: Codec<any>){
       const appPages = await this.mongoService.collections('appStore').collection.findOne({_id: payload})
       console.log(appPages);

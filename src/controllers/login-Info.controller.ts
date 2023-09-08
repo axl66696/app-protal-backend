@@ -53,7 +53,7 @@ export class LoginInfoController {
 
   @Replier("request")
   async getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
-
+    console.log(process.env.saltKey)
     const getUserInfo = await this.mongoDB
       .collections("user")
       .findDocuments({'userCode':payload.userCode,"passwordHash":payload.passwordHash,"orgNo":payload.orgNo});
