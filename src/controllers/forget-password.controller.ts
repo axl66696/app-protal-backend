@@ -22,17 +22,19 @@ export class forgetPasswordUserController {
   }
 
   //處理前端申請忘記密碼
-  @Subscriber("apply")
-  async getOrders( message: JsMsg, payload: any) {
+  @Replier("apply")
+  async apply( message: Msg, payload: any, jsonCodec: Codec<any>) {
+    try{
     console.log(payload.userCode)
     const getUserInfo = await this.mongoDB
       .collections("user")
       .findDocuments({'userCode':payload.userCode,'eMail':payload.eMail});
     const userInfo:UserAccount=getUserInfo[0] as unknown as UserAccount
-    console.log(getUserInfo)
+    console.log(userInfo)
 
-    if(getUserInfo){
-      message.ack()
+    if(userInfo){
+      const returnMessage = {success:true}
+      message.respond(jsonCodec.encode(returnMessage));
       const transporter = nodemailer.createTransport({
               service: 'Gmail', // 例如，'Gmail' 或 'SMTP'
         auth: {
@@ -42,23 +44,36 @@ export class forgetPasswordUserController {
         const secret = process.env.saltKey;
         const emailTemplate = fs.readFileSync('./src/email-template/email-template.html', 'utf-8');
         const userName = userInfo.userCode
-        const token = jwt.sign(userInfo, secret, { expiresIn: '30d', algorithm: 'HS256' });
+        const userEmail = userInfo.eMail
+        const token = jwt.sign(userInfo, secret, { expiresIn: '900s', algorithm: 'HS256' });
         const mailOptions = {
           from: 'h34076144@gs.ncku.edu.tw',
-          to: 'firstblood0904@gmail.com',
-          subject: '忘記密碼通知',
+          to: userEmail,
+          subject: '忘記密碼通知 Forgot Password Notification',
           html: emailTemplate.replace('{{ username }}', userName).replace('{{ token }}', 'http://localhost:10000/login/'+token)
         };
         transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
             console.error(error);
-          } else {
-            console.log('Email sent: ' + info.response);
+            // const returnMessage = {success:false}
+            // message.respond(jsonCodec.encode(returnMessage));
+          } 
+          else {
+            const returnMessage = {success:true}
+            console.log('Email sent: ' + returnMessage);
           }
         });
     }
     else{
-      message.nak()
+      const returnMessage = {success:false}
+      console.log(returnMessage)
+      message.respond(jsonCodec.encode(returnMessage));
+    }}
+    catch(error)
+    {
+      const returnMessage = {success:false}
+      console.log(returnMessage)
+      message.respond(jsonCodec.encode(returnMessage));
     }
   }
 
