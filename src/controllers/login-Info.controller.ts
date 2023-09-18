@@ -58,6 +58,7 @@ export class LoginInfoController {
       .collections("user")
       .findDocuments({'userCode':payload.userCode,"passwordHash":payload.passwordHash,"orgNo":payload.orgNo});
     // console.log("userInfo", getUserInfo);
+    console.log("userCode", payload.userCode)
     const userInfo:UserAccount=getUserInfo[0] as unknown as UserAccount
 
     if(userInfo){

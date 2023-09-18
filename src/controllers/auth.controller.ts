@@ -27,16 +27,17 @@ export class authController {
   @Replier("request")
   async getOrders(message: Msg, payload: any, jsonCodec: Codec<any>) {
 
-    console.log(payload)
+    console.log('auth payload',payload)
     const verifiedToken = jwt.verify(payload.token, process.env.saltKey) as LoginInfo;
-    console.log(verifiedToken)
+    console.log('auth verifiedToken',verifiedToken)
     const getUserInfo = await this.mongoDB
       .collections("user")
       .findDocuments({'userCode':verifiedToken.userCode,"passwordHash":verifiedToken.passwordHash,"orgNo":verifiedToken.orgNo});
     // console.log("userInfo", getUserInfo);
 
+    console.log("auth getUserInfo", getUserInfo)
     const userInfo:UserAccount=getUserInfo[0] as unknown as UserAccount
-    console.log(userInfo)
+    console.log('auth userInfo', userInfo)
     if(userInfo){
       const returnMessage = {auth:true,userAccount: userInfo as any,}
       message.respond(jsonCodec.encode(returnMessage));
